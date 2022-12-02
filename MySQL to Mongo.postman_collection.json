@@ -1,0 +1,347 @@
+{
+	"info": {
+		"_postman_id": "43d043a9-46c2-4d36-9005-2d2ca377dbda",
+		"name": "MySQL to Mongo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23588897"
+	},
+	"item": [
+		{
+			"name": "create connector",
+			"item": [
+				{
+					"name": "source",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"mysql-connector\", \r\n    \"config\": {\r\n        \"connector.class\": \"io.debezium.connector.mysql.MySqlConnector\", \r\n        \"database.hostname\": \"0.0.0.0\", \r\n        \"database.port\": \"3306\", \r\n        \"database.user\": \"debezium\", \r\n        \"database.password\": \"debezium_password\", \r\n        \"database.server.id\": \"1\", \r\n        \"database.server.name\": \"mysql_server_name\", \r\n        \"database.include.list\": \"db_name\", \r\n        \"topic.prefix\":\"mysql\",\r\n        \"schema.history.internal.kafka.bootstrap.servers\": \"0.0.0.0:9092\", \r\n        \"schema.history.internal.kafka.topic\": \"dbhistory.db_name\", \r\n        \"include.schema.changes\": \"true\",\r\n        \"database.allowPublicKeyRetrieval\":\"true\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{debezium}}/connectors/",
+							"host": [
+								"{{debezium}}"
+							],
+							"path": [
+								"connectors",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "sink",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"mongodb-connector\",\r\n    \"config\": {\r\n        \"connector.class\": \"com.mongodb.kafka.connect.MongoSinkConnector\",\r\n        \"tasks.max\": \"1\",\r\n        \"topics\": \"mysql.db_name.table_name\",\r\n        \"connection.uri\": \"mongodb://admin:admin@localhost:27017/\",\r\n        \"database\": \"db_name\",\r\n        \"collection\": \"table_name\",\r\n        \"change.data.capture.handler\": \"com.mongodb.kafka.connect.sink.cdc.debezium.rdbms.mysql.MysqlHandler\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{debezium}}/connectors/",
+							"host": [
+								"{{debezium}}"
+							],
+							"path": [
+								"connectors",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "get connector",
+			"item": [
+				{
+					"name": "get connector",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{debezium}}/connectors/:connectorName",
+							"host": [
+								"{{debezium}}"
+							],
+							"path": [
+								"connectors",
+								":connectorName"
+							],
+							"variable": [
+								{
+									"key": "connectorName",
+									"value": "mongodb-connector"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "list connector",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{debezium}}/connectors",
+							"host": [
+								"{{debezium}}"
+							],
+							"path": [
+								"connectors"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "update connector",
+			"item": [
+				{
+					"name": "update connector",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"connector.class\": \"io.debezium.connector.postgresql.PostgresConnector\",\r\n    \"database.user\": \"postgres\",\r\n    \"database.dbname\": \"jf_entity\",\r\n    \"slot.name\": \"slot_postgres_cdc\",\r\n    \"tasks.max\": \"1\",\r\n    \"database.history.kafka.bootstrap.servers\": \"kafka:9092\",\r\n    \"database.history.kafka.topic\": \"schema-changes.public\",\r\n    \"transforms\": \"route\",\r\n    \"database.server.name\": \"dbserver2\",\r\n    \"schema.include.list\": \"public\",\r\n    \"plugin.name\": \"pgoutput\",\r\n    \"table.whitelist\": \"public.entity_term_taxonomy\",\r\n    \"transforms.route.type\": \"org.apache.kafka.connect.transforms.RegexRouter\",\r\n    \"transforms.route.regex\": \"([^.]+)\\\\.([^.]+)\\\\.([^.]+)\",\r\n    \"database.hostname\": \"postgresql.db\",\r\n    \"database.password\": \"eifei8aa5ohHe1uy7quu\",\r\n    \"transforms.route.replacement\": \"postgres_cdc_$3\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{debezium}}/connectors/:connectorName/config",
+							"host": [
+								"{{debezium}}"
+							],
+							"path": [
+								"connectors",
+								":connectorName",
+								"config"
+							],
+							"variable": [
+								{
+									"key": "connectorName",
+									"value": "mongodb-connector"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete connector",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{debezium}}/connectors/:connectorName",
+							"host": [
+								"{{debezium}}"
+							],
+							"path": [
+								"connectors",
+								":connectorName"
+							],
+							"variable": [
+								{
+									"key": "connectorName",
+									"value": "mysql-connector"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "connector status",
+			"item": [
+				{
+					"name": "status connector",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{debezium}}/connectors/:connectorName/status",
+							"host": [
+								"{{debezium}}"
+							],
+							"path": [
+								"connectors",
+								":connectorName",
+								"status"
+							],
+							"variable": [
+								{
+									"key": "connectorName",
+									"value": "mongodb-connector"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "pause/resume connector",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{debezium}}/connectors/:connectorName/:action",
+							"host": [
+								"{{debezium}}"
+							],
+							"path": [
+								"connectors",
+								":connectorName",
+								":action"
+							],
+							"variable": [
+								{
+									"key": "connectorName",
+									"value": "postgres-source"
+								},
+								{
+									"key": "action",
+									"value": "resume",
+									"description": "Pause: pause, Resume: resume"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "restart connector",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{debezium}}/connectors/:connectorName/restart?includeTasks=true&onlyFailed=false",
+							"host": [
+								"{{debezium}}"
+							],
+							"path": [
+								"connectors",
+								":connectorName",
+								"restart"
+							],
+							"query": [
+								{
+									"key": "includeTasks",
+									"value": "true"
+								},
+								{
+									"key": "onlyFailed",
+									"value": "false"
+								}
+							],
+							"variable": [
+								{
+									"key": "connectorName",
+									"value": "jdbc-jf_entity-entity_term_taxonomy"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "list plugin",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{debezium}}/connector-plugins",
+					"host": [
+						"{{debezium}}"
+					],
+					"path": [
+						"connector-plugins"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
