@@ -80,7 +80,7 @@ $ bin/connect-distributed.sh config/connect-distributed.properties
 ## Check if kafka connect plugins was installed successfully
 
 ```
-curl --location --request GET 'localhost:8083/connector-plugins'
+$ curl --location --request GET 'localhost:8083/connector-plugins'
 ```
 
 ## Create Source & Sink Connector
@@ -88,7 +88,7 @@ curl --location --request GET 'localhost:8083/connector-plugins'
 ### Create MySQL Source Connector
 
 ```
-curl --location --request POST 'localhost:8083/connectors/' \
+$ curl --location --request POST 'localhost:8083/connectors/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "name": "mysql-connector",
@@ -113,7 +113,7 @@ curl --location --request POST 'localhost:8083/connectors/' \
 ### Create MongoDB Sink Connector
 
 ```
-curl --location --request POST 'localhost:8083/connectors/' \
+$ curl --location --request POST 'localhost:8083/connectors/' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "name": "mongodb-connector",
@@ -128,3 +128,12 @@ curl --location --request POST 'localhost:8083/connectors/' \
     }
 }'
 ```
+
+# Additional Configurations
+
+## Change Kafka & Zookeeper data directory
+
+- Zookeeper  
+  Change `dataDir` in Zookeeper config, default config located in `config/zookeeper.properties`, by default `dataDir=/tmp/zookeeper`
+- Kafka  
+  Change `log.dirs` in Kafka config, default config located in `config/server.properties`, by default `log.dirs=/tmp/kafka-logs`
